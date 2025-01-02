@@ -21,20 +21,26 @@ class Main : JavaPlugin(), Listener{
             val nowTime = LocalDateTime.now()
 
             val nowSecond = (nowTime.hour * 3600) +
-                            (nowTime.minute * 60) +
-                            (nowTime.second)
+                    (nowTime.minute * 60) +
+                    (nowTime.second)
 
             val nowTick = (nowSecond.toDouble() / 86400.0) * 24000.0
 
             val realTick = if (nowTick >= 6000)
-                            { nowTick - 6000 }
-                            else
-                            { nowTick + 18000 }
+            { nowTick - 6000 }
+            else
+            { nowTick + 18000 }
 
-            Bukkit.getWorld("world")!!.time = realTick.roundToLong()
+            val offset = this.config.getInt("offset")
+
+            var offsetTick = realTick + offset
+
+            if (offsetTick > 24000) offsetTick -= 24000
+
+            Bukkit.getWorld("world")!!.time = offsetTick.roundToLong()
 
             Bukkit.getOnlinePlayers().forEach {
-                it.sendActionBar(Component.text(realTick.toLong()))
+                it.sendActionBar(Component.text(offsetTick.toLong()))
             }
         }, 0, 1)
     }
